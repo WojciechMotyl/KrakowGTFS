@@ -1,4 +1,6 @@
 .venv/
 .idea/
 roadmap.md
-GTFS_KRK_T.zip
+src/GTFS_KRK_T.zip
+src/load_static_data_test.py
+/src/test.txt
