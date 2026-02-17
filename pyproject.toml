@@ -1,0 +1,11 @@
+[project]
+name = "krakowgtfs"
+version = "0.1.0"
+description = "Add your description here"
+requires-python = ">=3.14"
+dependencies = [
+    "fastapi>=0.129.0",
+    "gtfs-realtime-bindings>=2.0.0",
+    "pandas>=3.0.0",
+    "uvicorn>=0.41.0",
+]
