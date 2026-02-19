@@ -7,5 +7,6 @@ dependencies = [
     "fastapi>=0.129.0",
     "gtfs-realtime-bindings>=2.0.0",
     "pandas>=3.0.0",
+    "pandas-stubs~=3.0.0",
     "uvicorn>=0.41.0",
 ]
