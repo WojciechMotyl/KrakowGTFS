@@ -3,6 +3,7 @@ import pandas as pd
 from stops import Stop
 from typing import BinaryIO, Callable, Dict
 from trips import Trip
+from routes import Route
 
 # particular read stops.txt with csv stylist and gtfs specification
 def read_stops_file(file: BinaryIO) -> pd.DataFrame:
@@ -38,6 +39,18 @@ def read_trips_file(file: BinaryIO) -> pd.DataFrame:
     return data
 
 # create dict with keys, from trip_id and Trip object from pd dataframe
-def creating_dict_of_trips_objects(data_trips: pd.DataFrame)-> Dict[str, Stop]:
+def creating_dict_of_trips_objects(data_trips: pd.DataFrame)-> Dict[str, Trip]:
     trips = {rekord["trip_id"]: Trip(**rekord) for rekord in data_trips.to_dict(orient="records")}
     return trips
+
+def read_routes_file(file: BinaryIO) -> pd.DataFrame:
+    data = pd.read_csv(file,
+                       dtype=str,
+                       usecols=["route_id", "route_short_name", "route_long_name", "route_type"]
+                       )
+    return data
+
+# create dict with keys, from trip_id and Trip object from pd dataframe
+def creating_dict_of_routes_objects(data_routes: pd.DataFrame)-> Dict[str, Route]:
+    routes = {rekord["route_id"]: Route(**rekord) for rekord in data_routes.to_dict(orient="records")}
+    return routes
