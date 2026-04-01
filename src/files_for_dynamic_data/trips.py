@@ -15,3 +15,9 @@ class Trip:
                 self.direction_id = int(self.direction_id)
         except ValueError:
             self.direction_id = None
+
+    def print_info(self):
+        print(f"Trip ID: {self.trip_id}")
+        print(f"Route ID: {self.route_id}")
+        print(f"Trip Headsign: {self.trip_headsign}")
+        print(f"Direction ID: {self.direction_id}")

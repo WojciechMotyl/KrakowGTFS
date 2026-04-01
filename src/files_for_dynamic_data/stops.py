@@ -22,3 +22,8 @@ class Stop:
         except ValueError:
             self.stop_longitude = None
 
+    def print_info(self):
+        print(f"Stop ID: {self.stop_id}")
+        print(f"Stop Name: {self.stop_name}")
+        print(f"Stop Latitude: {self.stop_latitude}")
+        print(f"Stop Longitude: {self.stop_longitude}")
