@@ -8,5 +8,6 @@ dependencies = [
     "gtfs-realtime-bindings>=2.0.0",
     "pandas>=3.0.0",
     "pandas-stubs~=3.0.0",
+    "requests>=2.33.1",
     "uvicorn>=0.41.0",
 ]
