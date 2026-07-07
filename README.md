@@ -1,0 +1,1 @@
+The project goal is dowload data from GTFS Cracow server and do something with it.
