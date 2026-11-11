@@ -1,11 +1,12 @@
 from dataclasses import dataclass
+from typing import Optional
 
 @dataclass
 class Trip:
     trip_id: str
     route_id: str
     trip_headsign: str
-    direction_id: int
+    direction_id: Optional[int]
 
     def __post_init__(self):
         # changing direction_id to int, if we get str

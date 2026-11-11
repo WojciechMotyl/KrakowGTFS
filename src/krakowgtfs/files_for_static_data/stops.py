@@ -1,11 +1,12 @@
 from dataclasses import dataclass
+from typing import Optional
 
 @dataclass
 class Stop:
     stop_id: str
     stop_name: str
-    stop_latitude: float
-    stop_longitude: float
+    stop_latitude: Optional[float]
+    stop_longitude: Optional[float]
 
     def __post_init__(self):
         # from pandas object get stop_latitude and stop_longitude like a string, this method converse it after creating instance
