@@ -164,11 +164,26 @@ def save_to_db(rows, db_name="ztp_krakow.db"):
     conn.close()
 
 
+def get_data_from_url(url : str, headers : dict, timeout=15):
+    req_vp = urllib.request.Request(url, headers=headers)
+    with urllib.request.urlopen(req_vp, timeout=timeout) as response:
+        vp_data = response.read()
+        return vp_data
+
+# Sprawdza czy pobrane dane to poprawny plik binarny do parserowania
+def check_data_correctness(vehicle_positions_data):
+    if len(vehicle_positions_data) < 100:
+        print(f"[{time.strftime('%H:%M:%S')}] Serwer zwrócił pusty plik ({len(vehicle_positions_data)} bajtów)! Prawdopodobnie blokada anty-spamowa. Czekam do następnej pętli.")
+        return False
+    elif vehicle_positions_data.startswith(b'<') or vehicle_positions_data.startswith(b'{'):
+        print(f"[{time.strftime('%H:%M:%S')}] Serwer zwrócił tekst HTML/JSON zamiast danych binarnych. Czekam.")
+        return False
+    return True
 # for tests
 
 if __name__ == "__main__":
-    URL_VP_BUS = "https://gtfs.ztp.krakow.pl/VehiclePositions_A.pb"
-    URL_TU_BUS = "https://gtfs.ztp.krakow.pl/TripUpdates_A.pb"
+    URL_VEHICLE_POSITIONS_BUS = "https://gtfs.ztp.krakow.pl/VehiclePositions_A.pb"
+    URL_TRIP_UPDATES_BUS = "https://gtfs.ztp.krakow.pl/TripUpdates_A.pb"
     INTERVAL = 30
     # Inicjalizacja bazy przy pierwszym uruchomieniu
     init_db()
@@ -179,26 +194,16 @@ if __name__ == "__main__":
         try:
             headers = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) Chrome/120.0.0.0 Safari/537.36'}
 
-            # 1. Pobieranie z zabezpieczeniem przed zawieszeniem (timeout)
-            req_vp = urllib.request.Request(URL_VP_BUS, headers=headers)
-            with urllib.request.urlopen(req_vp, timeout=15) as response:
-                vp_data = response.read()
+            # getting data
+            vehicle_positions_data = get_data_from_url(URL_VEHICLE_POSITIONS_BUS, headers)
+            trip_updates_data = get_data_from_url(URL_TRIP_UPDATES_BUS, headers)
 
-            req_tu = urllib.request.Request(URL_TU_BUS, headers=headers)
-            with urllib.request.urlopen(req_tu, timeout=15) as response:
-                tu_data = response.read()
-
-            # 2. Sprawdzanie czy serwer nie oddał pustego pliku (Shadowban)
-            if len(vp_data) < 100:
-                print(
-                    f"[{time.strftime('%H:%M:%S')}] Serwer zwrócił pusty plik ({len(vp_data)} bajtów)! Prawdopodobnie blokada anty-spamowa. Czekam do następnej pętli.")
-            elif vp_data.startswith(b'<') or vp_data.startswith(b'{'):
-                print(f"[{time.strftime('%H:%M:%S')}] Serwer zwrócił tekst HTML/JSON zamiast danych binarnych. Czekam.")
-            else:
-                bus_rows = parse_ztp_pb(vp_data, tu_data, vehicle_type='A')
+            # Sprawdzenie poprawnosc i parserowanie danych
+            if check_data_correctness(vehicle_positions_data):
+                bus_rows = parse_ztp_pb(vehicle_positions_data, trip_updates_data, vehicle_type='A')
                 save_to_db(bus_rows)
                 print(
-                    f"[{time.strftime('%H:%M:%S')}] POBRANO: {len(vp_data)} bajtów. Zapisano {len(bus_rows)} rekordów.")
+                    f"[{time.strftime('%H:%M:%S')}] POBRANO: {len(vehicle_positions_data)} bajtów. Zapisano {len(bus_rows)} rekordów.")
 
         except urllib.error.URLError as e:
             print(f"[{time.strftime('%H:%M:%S')}] Problem z siecią/Timeout: {e}")
